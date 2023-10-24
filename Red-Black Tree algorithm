@@ -1,0 +1,124 @@
+class Node:
+    def __init__(self, key, color, parent, left=None, right=None):
+        self.key = key
+        self.color = color
+        self.parent = parent
+        self.left = left
+        self.right = right
+
+class RedBlackTree:
+    def __init__(self):
+        self.NIL_LEAF = Node(None, "black", None)
+        self.root = self.NIL_LEAF
+
+    def insert(self, key):
+        new_node = Node(key, "red", None, self.NIL_LEAF, self.NIL_LEAF)
+
+        if self.root == self.NIL_LEAF:
+            self.root = new_node
+            self.root.color = "black"
+            return
+
+        parent = None
+        current = self.root
+        while current != self.NIL_LEAF:
+            parent = current
+            if key < current.key:
+                current = current.left
+            else:
+                current = current.right
+
+        new_node.parent = parent
+        if key < parent.key:
+            parent.left = new_node
+        else:
+            parent.right = new_node
+
+        if new_node.parent == None:
+            new_node.color = "black"
+            return
+
+        if new_node.parent.parent == None:
+            return
+
+        self.fix_insert(new_node)
+
+    def fix_insert(self, node):
+        while node.color == "red" and node.parent.color == "red":
+            if node.parent == node.parent.parent.right:
+                uncle = node.parent.parent.left
+                if uncle.color == "red":
+                    node.parent.color = "black"
+                    uncle.color = "black"
+                    node.parent.parent.color = "red"
+                    node = node.parent.parent
+                else:
+                    if node == node.parent.left:
+                        node = node.parent
+                        self.rotate_right(node)
+                    node.parent.color = "black"
+                    node.parent.parent.color = "red"
+                    self.rotate_left(node.parent.parent)
+            else:
+                uncle = node.parent.parent.right
+                if uncle.color == "red":
+                    node.parent.color = "black"
+                    uncle.color = "black"
+                    node.parent.parent.color = "red"
+                    node = node.parent.parent
+                else:
+                    if node == node.parent.right:
+                        node = node.parent
+                        self.rotate_left(node)
+                    node.parent.color = "black"
+                    node.parent.parent.color = "red"
+                    self.rotate_right(node.parent.parent)
+            if node == self.root:
+                break
+        self.root.color = "black"
+
+    def rotate_left(self, node):
+        right_child = node.right
+        node.right = right_child.left
+        if right_child.left != self.NIL_LEAF:
+            right_child.left.parent = node
+        right_child.parent = node.parent
+        if node.parent == None:
+            self.root = right_child
+        elif node == node.parent.left:
+            node.parent.left = right_child
+        else:
+            node.parent.right = right_child
+        right_child.left = node
+        node.parent = right_child
+
+    def rotate_right(self, node):
+        left_child = node.left
+        node.left = left_child.right
+        if left_child.right != self.NIL_LEAF:
+            left_child.right.parent = node
+        left_child.parent = node.parent
+        if node.parent == None:
+            self.root = left_child
+        elif node == node.parent.right:
+            node.parent.right = left_child
+        else:
+            node.parent.left = left_child
+        left_child.right = node
+        node.parent = left_child
+
+    def inorder_traversal(self, node):
+        if node != self.NIL_LEAF:
+            self.inorder_traversal(node.left)
+            print(f"{node.key} ({node.color})", end=" ")
+            self.inorder_traversal(node.right)
+
+# Example usage:
+if __name__ == "__main__":
+    rb_tree = RedBlackTree()
+    keys = [10, 20, 30, 40, 50, 60, 70]
+    for key in keys:
+        rb_tree.insert(key)
+
+    print("Inorder Traversal of Red-Black Tree:")
+    rb_tree.inorder_traversal(rb_tree.root)
