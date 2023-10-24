@@ -1,0 +1,43 @@
+import sys
+
+class Graph:
+    def __init__(self, vertices):
+        self.V = vertices
+        self.graph = [[0] * vertices for _ in range(vertices)]
+
+    def add_edge(self, u, v, w):
+        self.graph[u][v] = w
+
+    def floyd_warshall(self):
+        dist = [row[:] for row in self.graph]
+
+        for k in range(self.V):
+            for i in range(self.V):
+                for j in range(self.V):
+                    if dist[i][k] + dist[k][j] < dist[i][j]:
+                        dist[i][j] = dist[i][k] + dist[k][j]
+
+        self.print_solution(dist)
+
+    def print_solution(self, dist):
+        print("Shortest distances between all pairs of vertices:")
+        for i in range(self.V):
+            for j in range(self.V):
+                if dist[i][j] == float("inf"):
+                    print("INF", end="\t")
+                else:
+                    print(dist[i][j], end="\t")
+            print()
+
+# Example usage:
+if __name__ == "__main__":
+    V = 4
+    graph = Graph(V)
+    graph.graph = [
+        [0, 5, float("inf"), 10],
+        [float("inf"), 0, 3, float("inf")],
+        [float("inf"), float("inf"), 0, 1],
+        [float("inf"), float("inf"), float("inf"), 0]
+    ]
+
+    graph.floyd_warshall()
