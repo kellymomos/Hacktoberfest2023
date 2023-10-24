@@ -1,0 +1,71 @@
+class Node:
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+        self.next = None
+
+class HashMap:
+    def __init__(self, size=100):
+        self.size = size
+        self.table = [None] * size
+
+    def _hash(self, key):
+        return hash(key) % self.size
+
+    def put(self, key, value):
+        index = self._hash(key)
+        if self.table[index] is None:
+            self.table[index] = Node(key, value)
+        else:
+            current = self.table[index]
+            while current:
+                if current.key == key:
+                    current.value = value
+                    return
+                if current.next is None:
+                    break
+                current = current.next
+            current.next = Node(key, value)
+
+    def get(self, key):
+        index = self._hash(key)
+        current = self.table[index]
+        while current:
+            if current.key == key:
+                return current.value
+            current = current.next
+        raise KeyError(f"Key '{key}' not found in the hash map")
+
+    def remove(self, key):
+        index = self._hash(key)
+        current = self.table[index]
+        previous = None
+        while current:
+            if current.key == key:
+                if previous:
+                    previous.next = current.next
+                else:
+                    self.table[index] = current.next
+                return
+            previous = current
+            current = current.next
+        raise KeyError(f"Key '{key}' not found in the hash map")
+
+# Example usage:
+if __name__ == "__main__":
+    hashmap = HashMap()
+    
+    hashmap.put("name", "Alice")
+    hashmap.put("age", 30)
+    hashmap.put("city", "Wonderland")
+
+    print("Name:", hashmap.get("name"))
+    print("Age:", hashmap.get("age"))
+    print("City:", hashmap.get("city"))
+
+    hashmap.remove("age")
+
+    try:
+        print("Age (after removal):", hashmap.get("age"))
+    except KeyError as e:
+        print(e)
