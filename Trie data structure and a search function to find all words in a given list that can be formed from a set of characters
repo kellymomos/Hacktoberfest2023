@@ -1,0 +1,48 @@
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end_of_word = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word):
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end_of_word = True
+
+    def search_words(self, node, char_set, current_word, result):
+        if node.is_end_of_word:
+            result.append(current_word)
+
+        for char, child_node in node.children.items():
+            if char in char_set:
+                remaining_set = char_set.copy()
+                remaining_set.remove(char)
+                self.search_words(child_node, remaining_set, current_word + char, result)
+
+    def find_words(self, char_set):
+        result = []
+        for char, child_node in self.root.children.items():
+            if char in char_set:
+                remaining_set = char_set.copy()
+                remaining_set.remove(char)
+                self.search_words(child_node, remaining_set, char, result)
+        return result
+
+# Example usage:
+if __name__ == "__main__":
+    word_list = ["apple", "banana", "peach", "cherry", "apricot", "pear"]
+    trie = Trie()
+    for word in word_list:
+        trie.insert(word)
+
+    characters = set("aplehcna")
+    found_words = trie.find_words(characters)
+
+    print("Words that can be formed from 'aplehcna':")
+    print(found_words)
